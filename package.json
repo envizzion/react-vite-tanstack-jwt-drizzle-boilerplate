@@ -42,7 +42,7 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.28.0",
-    "drizzle-orm": "^0.36.1",
+    "drizzle-orm": "^0.36.4",
     "fastify": "^4.28.0",
     "mysql2": "^3.11.3",
     "nestjs-pino": "^4.1.0",
