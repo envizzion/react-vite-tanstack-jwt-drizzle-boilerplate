@@ -6,18 +6,18 @@ const ajv = new Ajv({ allErrors: true, useDefaults: true });
 const schema = {
   type: 'object',
   properties: {
-    TYPEORM_HOST: { type: 'string' },
-    TYPEORM_PORT: { type: 'string' },
-    TYPEORM_USERNAME: { type: 'string' },
-    TYPEORM_PASSWORD: { type: 'string' },
-    TYPEORM_DATABASE: { type: 'string' },
+    DB_HOST: { type: 'string' },
+    DB_PORT: { type: 'string' },
+    DB_USER: { type: 'string' },
+    DB_PW: { type: 'string' },
+    DB_NAME: { type: 'string' },
   },
   required: [
-    'TYPEORM_HOST',
-    'TYPEORM_PORT',
-    'TYPEORM_USERNAME',
-    'TYPEORM_PASSWORD',
-    'TYPEORM_DATABASE',
+    "DB_HOST",
+    "DB_PORT",
+    "DB_USER",
+    "DB_PW",
+    "DB_NAME",
   ],
 };
 

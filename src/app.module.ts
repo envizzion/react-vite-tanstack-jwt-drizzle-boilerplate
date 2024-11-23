@@ -1,28 +1,32 @@
+import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
 import { Module, RequestMethod, ValidationError, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { LoggerModule, } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { IamModule } from './iam/iam.module';
-import { validateSchemaEnv } from './helpers/validation-schema-env';
-import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
 import { DbModule } from './db/db.module';
-import * as schema from './db/schema'
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import * as schema from './db/schema';
+import { validateSchemaEnv } from './helpers/validation-schema-env';
+import { IamModule } from './iam/iam.module';
 import {
   AllExceptionsFilter,
-  ValidationExceptionFilter,
   BadRequestExceptionFilter,
-  UnauthorizedExceptionFilter,
   ForbiddenExceptionFilter,
   NotFoundExceptionFilter,
+  UnauthorizedExceptionFilter,
+  ValidationExceptionFilter,
 } from './shared/filters';
-import { LoggerModule, } from 'nestjs-pino';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', '.env.local', '.env.dev', '.env.stage', '.env.prod'],
+      validate: validateSchemaEnv,
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV === 'prod' ? 'info' : 'debug',
@@ -57,10 +61,15 @@ import { LoggerModule, } from 'nestjs-pino';
       },
       exclude: [{ method: RequestMethod.ALL, path: 'check' }], // Exclude logging for specific routes
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: ['.env', '.env.dev', '.env.stage', '.env.prod'],
-      validate: validateSchemaEnv,
+    DrizzlePGModule.register({
+      tag: 'DB',
+      pg: {
+        connection: 'pool',
+        config: {
+          connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PW}@${process.env.DB_HOST}:${parseInt(process.env.DB_PORT)}/${process.env.DB_NAME}`,
+        },
+      },
+      config: { schema: { ...schema } },
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -74,16 +83,6 @@ import { LoggerModule, } from 'nestjs-pino';
     }),
     IamModule,
     UsersModule,
-    DrizzlePGModule.register({
-      tag: 'DB',
-      pg: {
-        connection: 'pool',
-        config: {
-          connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PW}@${process.env.DB_HOST}:${parseInt(process.env.DB_PORT)}/${process.env.DB_NAME}`,
-        },
-      },
-      config: { schema: { ...schema } },
-    }),
     DbModule,
   ],
   controllers: [AppController],

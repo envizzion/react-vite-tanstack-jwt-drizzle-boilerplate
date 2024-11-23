@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './models/users.model';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
-import { MailerModule } from '../shared/mailer/mailer.module';
 import { BcryptService } from '../shared/hashing/bcrypt.service';
 import { HashingService } from '../shared/hashing/hashing.service';
+import { MailerModule } from '../shared/mailer/mailer.module';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 // import { provideUsersRepository } from './repositories/users.repository.provider';
 import { UsersRepository } from './users.repository';
 
